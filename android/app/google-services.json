@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "445722473026",
+    "project_id": "alwattar-groups-school1",
+    "storage_bucket": "alwattar-groups-school1.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:445722473026:android:e2ae21cc837feb11a4b3db",
+        "android_client_info": {
+          "package_name": "com.alwatar.admin.alwatar_admin"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBrFV4gLHraTXwSR-GfXWQCUa83v7VtTcU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
