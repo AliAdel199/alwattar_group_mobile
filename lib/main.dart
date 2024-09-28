@@ -1,9 +1,14 @@
+import 'package:alwattar_group_mobile/constant.dart';
+import 'package:alwattar_group_mobile/login_page.dart';
+import 'package:alwattar_group_mobile/rectanglebtn.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'firebase_options.dart';
+import 'student_profile.dart';
 
 Future<void> main() async {
     WidgetsFlutterBinding.ensureInitialized();
@@ -187,7 +192,9 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: MyHomePage(
+         initialRoute: '/',
+      routes: {
+        '/': (context) => MyHomePage(
           title: 'Flutter Demo Home Page',
           auth1: auth1,
           auth2: auth2,
@@ -205,6 +212,26 @@ class MyApp extends StatelessWidget {
           firestore6: firestore6,
           firestore7: firestore7,
           firestore8: firestore8),
+          // '/userProfile':(context) => UserProfilePage()
+      },
+      // home: MyHomePage(
+      //     title: 'Flutter Demo Home Page',
+      //     auth1: auth1,
+      //     auth2: auth2,
+      //     auth3: auth3,
+      //     auth4: auth4,
+      //     auth5: auth5,
+      //     auth6: auth6,
+      //     auth7: auth7,
+      //     auth8: auth8,
+      //     firestore1: firestore1,
+      //     firestore2: firestore2,
+      //     firestore3: firestore3,
+      //     firestore4: firestore4,
+      //     firestore5: firestore5,
+      //     firestore6: firestore6,
+      //     firestore7: firestore7,
+      //     firestore8: firestore8),
     );
   }
 }
@@ -256,38 +283,76 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
 
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
+
+Future<void> loadData() async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  String? firestoreSave = prefs.getString('firestoreSave');
+  String? uid = prefs.getString('userID');
+
+
+  switch (firestoreSave){
+    case "firestore1":
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>StudentProfile(firestore: widget.firestore1,firestoreTest: "1",userID: uid)));
+        break;
+    case "firestore2":
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>StudentProfile(firestore: widget.firestore1,firestoreTest: "2",userID: uid)));
+        break;
+    case "firestore3":
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>StudentProfile(firestore: widget.firestore1,firestoreTest: "3",userID: uid)));
+        break;
+    case "firestore4":
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>StudentProfile(firestore: widget.firestore1,firestoreTest: "4",userID: uid)));
+        break;
+    case "firestore5":
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>StudentProfile(firestore: widget.firestore1,firestoreTest: "5",userID: uid)));
+        break;
+    case "firestore6":
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>StudentProfile(firestore: widget.firestore1,firestoreTest: "6",userID: uid)));
+        break;
+    case "firestore7":
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>StudentProfile(firestore: widget.firestore1,firestoreTest: "7",userID: uid)));
+        break;
+    case "firestore8":
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>StudentProfile(firestore: widget.firestore1,firestoreTest: "8",userID: uid)));
+        break;
+
+
+
   }
+  
+}
+
+@override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    loadData();
+  }
+
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title),
+      appBar: AppBar(centerTitle: true,
+        backgroundColor: kColor,
+        title: Text("مدارس الوتار الاهلية",style: TextStyle(color: Colors.white),),
       ),
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+        child: Column(mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
+   RectangleButton(title: "مدرسة الوتار الابتدائية الاهلية المختلطة", bgColor: kColor, width: 350, onPressed: (){Navigator.push(context, MaterialPageRoute(builder: (context)=>LoginScreen( auth: widget.auth1, firestore: widget.firestore1,firestoreSave:"firestore1" )));}),
+   RectangleButton(title: "مدرسة أجيال الوتار الابتدائية الاهلية المختلطة", bgColor: kColor, width: 350, onPressed: (){Navigator.push(context, MaterialPageRoute(builder: (context)=>LoginScreen(auth: widget.auth2, firestore: widget.firestore2,firestoreSave:"firestore1" )));}),
+   RectangleButton(title: "ثانوية الوتار الاهلية للبنين", bgColor: kColor, width: 350, onPressed: (){Navigator.push(context, MaterialPageRoute(builder: (context)=>LoginScreen(auth: widget.auth3, firestore: widget.firestore3,firestoreSave:"firestore3" )));}),
+   RectangleButton(title: "ثانوية الوتار الاهلية للبنات", bgColor: kColor, width: 350, onPressed: (){Navigator.push(context, MaterialPageRoute(builder: (context)=>LoginScreen(auth: widget.auth4, firestore: widget.firestore4,firestoreSave:"firestore4" )));}),
+   RectangleButton(title:"ثانوية اجيال الوتار الاهلية للبنين", bgColor: kColor, width: 350, onPressed: (){Navigator.push(context, MaterialPageRoute(builder: (context)=>LoginScreen(auth: widget.auth5, firestore: widget.firestore5,firestoreSave:"firestore5" )));}),
+   RectangleButton(title: "مدرسة دار الوتار الابتدائية الاهلية المختلطة", bgColor: kColor, width: 350, onPressed: (){Navigator.push(context, MaterialPageRoute(builder: (context)=>LoginScreen(auth: widget.auth6, firestore: widget.firestore6,firestoreSave:"firestore6" )));}),
+   RectangleButton(title: "ثانوية دار الوتار الاهلية للبنات", bgColor: kColor, width: 350, onPressed: (){Navigator.push(context, MaterialPageRoute(builder: (context)=>LoginScreen(auth: widget.auth7, firestore: widget.firestore7,firestoreSave:"firestore7" )));}),
+   RectangleButton(title: "ثانوية دار الوتار الاهلية للبنين", bgColor: kColor, width: 350, onPressed: (){Navigator.push(context, MaterialPageRoute(builder: (context)=>LoginScreen(auth: widget.auth8, firestore: widget.firestore8,firestoreSave:"firestore8" )));}),
+
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+   // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }

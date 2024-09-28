@@ -1,1 +1,1 @@
-      home:  MyHomePage(title: 'Flutter Demo Home Page',firestore1:firestore1, firestore2:authfirestore2,firestore3:widget. firestore3,firestore4:widget. firestore4,firestore5:widget. firestore5,firestore6:authfirestore6,firestore7:authfirestore7,firestore8:authfirestore8),
+mainAppAuth: auth, firestore1: widget.firestore1, widget.firestore2: widget.firestore2,firestore3: widget.firestore3,firestore4:widget.firestore4,firestore5: widget.firestore5,firestore6: widget.firestore6,firestore7: widget.firestore7,firestore8: widget.firestore8

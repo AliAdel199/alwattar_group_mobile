@@ -1,29 +1,21 @@
+import 'package:alwattar_group_mobile/student_profile.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginScreen extends StatefulWidget {
+  const LoginScreen({
+    super.key,
+    required this.auth,
+    required this.firestore,
+    required this.firestoreSave
+  });
 
-  const LoginScreen({super.key,required this.mainAppAuth,  required this.firestore1, required this.firestore2,
-    required this.firestore3,
-    required this.firestore4,
-    required this.firestore5,
-    required this.firestore6,
-    required this.firestore7,
-    required this.firestore8,});
-    final FirebaseAuth mainAppAuth;
+  final FirebaseAuth auth;
+  final FirebaseFirestore firestore;
+  final String firestoreSave;
 
-    
-  final FirebaseFirestore firestore1;
-  final FirebaseFirestore firestore2;
-  final FirebaseFirestore firestore3;
-  final FirebaseFirestore firestore4;
-  final FirebaseFirestore firestore5;
-  final FirebaseFirestore firestore6;
-  final FirebaseFirestore firestore7;
-  final FirebaseFirestore firestore8;
   @override
   _LoginScreenState createState() => _LoginScreenState();
 }
@@ -49,49 +41,9 @@ class _LoginScreenState extends State<LoginScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              TextFormField(
-                controller: _emailController,
-                keyboardType: TextInputType.emailAddress,
-                decoration: InputDecoration(
-                  labelText: 'Email',
-                  border: OutlineInputBorder(),
-                ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter your email';
-                  } else if (!RegExp(
-                          r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
-                      .hasMatch(value)) {
-                    return 'Enter a valid email address';
-                  }
-                  return null;
-                },
-              ),
+              _buildEmailField(),
               SizedBox(height: 20),
-              TextFormField(
-                controller: _passwordController,
-                obscureText: _obscurePassword,
-                decoration: InputDecoration(
-                  labelText: 'Password',
-                  border: OutlineInputBorder(),
-                  suffixIcon: IconButton(
-                    icon: Icon(_obscurePassword
-                        ? Icons.visibility
-                        : Icons.visibility_off),
-                    onPressed: () {
-                      setState(() {
-                        _obscurePassword = !_obscurePassword;
-                      });
-                    },
-                  ),
-                ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter your password';
-                  }
-                  return null;
-                },
-              ),
+              _buildPasswordField(),
               SizedBox(height: 20),
               Align(
                 alignment: Alignment.centerRight,
@@ -114,7 +66,7 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               SizedBox(height: 20),
               _isLoading
-                  ? CircularProgressIndicator()
+                  ? Center(child: CircularProgressIndicator())
                   : ElevatedButton(
                       onPressed: _login,
                       child: Text('Login'),
@@ -126,6 +78,53 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
+  Widget _buildEmailField() {
+    return TextFormField(
+      controller: _emailController,
+      keyboardType: TextInputType.emailAddress,
+      decoration: InputDecoration(
+        labelText: 'Email',
+        border: OutlineInputBorder(),
+      ),
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return 'Please enter your email';
+        } else if (!RegExp(
+                r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+            .hasMatch(value)) {
+          return 'Enter a valid email address';
+        }
+        return null;
+      },
+    );
+  }
+
+  Widget _buildPasswordField() {
+    return TextFormField(
+      controller: _passwordController,
+      obscureText: _obscurePassword,
+      decoration: InputDecoration(
+        labelText: 'Password',
+        border: OutlineInputBorder(),
+        suffixIcon: IconButton(
+          icon: Icon(
+              _obscurePassword ? Icons.visibility : Icons.visibility_off),
+          onPressed: () {
+            setState(() {
+              _obscurePassword = !_obscurePassword;
+            });
+          },
+        ),
+      ),
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return 'Please enter your password';
+        }
+        return null;
+      },
+    );
+  }
+
   void _login() async {
     if (_formKey.currentState!.validate()) {
       setState(() {
@@ -133,14 +132,22 @@ class _LoginScreenState extends State<LoginScreen> {
       });
 
       try {
-        await widget.mainAppAuth.signInWithEmailAndPassword(
+      UserCredential userCredential =   await widget.auth.signInWithEmailAndPassword(
           email: _emailController.text.trim(),
           password: _passwordController.text.trim(),
         );
+   // Get the UID of the signed-in user
+      String uid = userCredential.user!.uid; 
+          SharedPreferences prefs = await SharedPreferences.getInstance();
+          prefs.setString("firestoreSave", widget.firestoreSave);
+          prefs.setString("userID",uid);
+
+
 
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Login Successful!')),
         );
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>StudentProfile(firestore: widget.firestore,firestoreTest: widget.firestoreSave,userID: uid,)));
 
         // Navigate to a different screen or update state
       } on FirebaseAuthException catch (e) {
@@ -162,7 +169,8 @@ class PasswordRecoveryScreen extends StatefulWidget {
 }
 
 class _PasswordRecoveryScreenState extends State<PasswordRecoveryScreen> {
-  final TextEditingController _recoveryEmailController = TextEditingController();
+  final TextEditingController _recoveryEmailController =
+      TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
@@ -186,27 +194,10 @@ class _PasswordRecoveryScreenState extends State<PasswordRecoveryScreen> {
                 style: TextStyle(fontSize: 16),
               ),
               SizedBox(height: 20),
-              TextFormField(
-                controller: _recoveryEmailController,
-                keyboardType: TextInputType.emailAddress,
-                decoration: InputDecoration(
-                  labelText: 'Email',
-                  border: OutlineInputBorder(),
-                ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter your email';
-                  } else if (!RegExp(
-                          r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
-                      .hasMatch(value)) {
-                    return 'Enter a valid email address';
-                  }
-                  return null;
-                },
-              ),
+              _buildEmailField(),
               SizedBox(height: 20),
               _isLoading
-                  ? CircularProgressIndicator()
+                  ? Center(child: CircularProgressIndicator())
                   : ElevatedButton(
                       onPressed: _recoverPassword,
                       child: Text('Recover Password'),
@@ -215,6 +206,27 @@ class _PasswordRecoveryScreenState extends State<PasswordRecoveryScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildEmailField() {
+    return TextFormField(
+      controller: _recoveryEmailController,
+      keyboardType: TextInputType.emailAddress,
+      decoration: InputDecoration(
+        labelText: 'Email',
+        border: OutlineInputBorder(),
+      ),
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return 'Please enter your email';
+        } else if (!RegExp(
+                r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+            .hasMatch(value)) {
+          return 'Enter a valid email address';
+        }
+        return null;
+      },
     );
   }
 
