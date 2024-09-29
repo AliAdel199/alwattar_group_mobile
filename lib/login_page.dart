@@ -1,3 +1,4 @@
+import 'package:alwattar_group_mobile/constant.dart';
 import 'package:alwattar_group_mobile/student_profile.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -31,47 +32,53 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Login'),
+      appBar: AppBar(centerTitle: true, backgroundColor: kColor,iconTheme: IconThemeData(color: Colors.white),
+        title: Text('تسجيل الدخول',style: TextStyle(color: Colors.white),),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(
           key: _formKey,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              _buildEmailField(),
-              SizedBox(height: 20),
-              _buildPasswordField(),
-              SizedBox(height: 20),
-              Align(
-                alignment: Alignment.centerRight,
-                child: GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => PasswordRecoveryScreen(),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SizedBox(width: 150,height: 150, child: Image.asset("assets/logoo.png")),
+                  SizedBox(height: 20),
+                  Text("مجموعة الوتار التعليمية",style: TextStyle(fontSize: 20,fontWeight: FontWeight.bold),),
+                     SizedBox(height: 20),
+                _buildEmailField(),
+                SizedBox(height: 20),
+                _buildPasswordField(),
+                SizedBox(height: 20),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => PasswordRecoveryScreen(),
+                        ),
+                      );
+                    },
+                    child: Text(
+                      'Forgot Password?',
+                      style: TextStyle(
+                        color: Theme.of(context).primaryColor,
                       ),
-                    );
-                  },
-                  child: Text(
-                    'Forgot Password?',
-                    style: TextStyle(
-                      color: Theme.of(context).primaryColor,
                     ),
                   ),
                 ),
-              ),
-              SizedBox(height: 20),
-              _isLoading
-                  ? Center(child: CircularProgressIndicator())
-                  : ElevatedButton(
-                      onPressed: _login,
-                      child: Text('Login'),
-                    ),
-            ],
+                SizedBox(height: 20),
+                _isLoading
+                    ? Center(child: CircularProgressIndicator())
+                    : ElevatedButton(
+                        onPressed: _login,
+                        child: Text('تسجيل الدخول'),
+                      ),
+              ],
+            ),
           ),
         ),
       ),

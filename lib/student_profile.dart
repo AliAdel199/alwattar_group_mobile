@@ -1,3 +1,4 @@
+import 'package:alwattar_group_mobile/payment_summary.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -85,7 +86,7 @@ class _StudentProfileState extends State<StudentProfile> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
+      appBar: AppBar(iconTheme: IconThemeData(color: Colors.white),  centerTitle: true, title: Text("مجموعة الوتار التعليمية",style: TextStyle(color: Colors.white),),
         backgroundColor: kColor,
         actions: [
           IconButton(
@@ -110,14 +111,10 @@ class _StudentProfileState extends State<StudentProfile> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             // صورة المستخدم
-            const CircleAvatar(
-              radius: 30,
+             CircleAvatar(
+              radius: 40,
               backgroundColor: kColor,
-              child: CircleAvatar(
-                radius: 25,
-                backgroundColor: Colors.white,
-                child: Icon(Icons.person, size: 50, color: kColor),
-              ),
+              child:  Image.asset("assets/profile.png"),
             ),
             const SizedBox(height: 16),
             // اسم الطالب
@@ -127,7 +124,7 @@ class _StudentProfileState extends State<StudentProfile> {
             ),
            Text(
               studentClass.isEmpty ? "جارٍ التحميل..." : studentClass,
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 15),
             // العناوين
@@ -195,7 +192,9 @@ class _StudentProfileState extends State<StudentProfile> {
             const SizedBox(height: 16),
             // الأزرار السفلية
             ElevatedButton(
-              onPressed: () {},
+              onPressed: () {
+                Navigator.push(context, MaterialPageRoute(builder: (context)=>PaymentSummaryScreen(student_id: widget.userID!,)));
+              },
               style: ElevatedButton.styleFrom(
                 backgroundColor: kColor,
                 minimumSize: const Size(double.infinity, 50),
