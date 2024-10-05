@@ -1,3 +1,4 @@
+import 'package:alwattar_group_mobile/notificationscreen.dart';
 import 'package:alwattar_group_mobile/payment_summary.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -203,7 +204,10 @@ class _StudentProfileState extends State<StudentProfile> {
             ),
             const SizedBox(height: 8),
             ElevatedButton(
-              onPressed: () {},
+              onPressed: () {
+                Navigator.push(context, MaterialPageRoute(builder: (context)=>NotificationScreen(studentDocumentId: widget.userID!,)));
+
+              },
               style: ElevatedButton.styleFrom(
                 backgroundColor: kColor,
                 minimumSize: const Size(double.infinity, 50),

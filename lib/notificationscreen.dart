@@ -3,68 +3,148 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class NotificationScreen extends StatelessWidget {
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
+  final String studentDocumentId ;
+
+   NotificationScreen({super.key,required this.studentDocumentId}); // قم بتعديل هذا المعرف
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: const Color(0xff004d40),
-        title: const Text('الإشعارات والتبليغات'),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: StreamBuilder<QuerySnapshot>(
-          stream: firestore.collection('NOTIFICATION').orderBy('timestamp', descending: true).snapshots(),
-          builder: (context, snapshot) {
-            if (!snapshot.hasData) {
-              return const Center(child: CircularProgressIndicator());
-            }
-
-            var notifications = snapshot.data!.docs;
-
-            if (notifications.isEmpty) {
-              return const Center(
-                child: Text(
-                  'لا يوجد إشعارات متاحة',
-                  style: TextStyle(fontSize: 18),
-                ),
-              );
-            }
-
-            return ListView.builder(
-              itemCount: notifications.length,
-              itemBuilder: (context, index) {
-                var notification = notifications[index];
-                var type = notification['type'];
-                
-                if (type == 'payment') {
-                  return PaymentNotificationCard(
-                    message: notification['message'],
-                    paidAmount: notification['additional_info']['paid_amount'],
-                    remainingAmount: notification['additional_info']['remaining_amount'],
-                    timestamp: notification['timestamp'].toDate(),
-                  );
-                } else {
-                  return GeneralNotificationCard(
-                    message: notification['message'],
-                    timestamp: notification['timestamp'].toDate(),
-                  );
-                }
-              },
-            );
-          },
+    return DefaultTabController(
+      length: 2,
+      child: Scaffold(
+        appBar: AppBar(iconTheme: IconThemeData(color: Colors.white),
+          backgroundColor: const Color(0xff004d40),
+          title: const Text('الإشعارات والتبليغات',style: TextStyle(color: Colors.white),),
+          bottom: const TabBar(labelColor: Colors.blue,unselectedLabelColor:  Colors.white,indicatorColor: Colors.blue,overlayColor: MaterialStatePropertyAll(Colors.black12),
+            tabs: [
+              Tab(text: 'إشعارات الاستلام'),
+              Tab(text: 'إشعارات عامة'),
+            ],
+          ),
+        ),
+        body: TabBarView(
+          children: [
+            // تبويب الإشعارات المالية
+            PaymentNotificationsTab(studentDocumentId: studentDocumentId),
+            // تبويب التبليغات العامة
+            GeneralNotificationsTab(studentDocumentId: studentDocumentId),
+          ],
         ),
       ),
     );
   }
 }
 
-// Widget لعرض إشعارات الدفع في شكل بطاقة
+// ويدجت لعرض تبويب الإشعارات المالية
+class PaymentNotificationsTab extends StatelessWidget {
+  final String studentDocumentId;
+  final FirebaseFirestore firestore = FirebaseFirestore.instance;
+
+  PaymentNotificationsTab({required this.studentDocumentId});
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<QuerySnapshot>(
+      stream: firestore
+          .collection('students')
+          .doc(studentDocumentId) // معرف المستند الخاص بالطالب
+          .collection('notification') // مجموعة الإشعارات المالية
+          .orderBy('timestamp', descending: true)
+          .snapshots(),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        var notifications = snapshot.data!.docs;
+
+        if (notifications.isEmpty) {
+          return const Center(
+            child: Text(
+              'لا يوجد إشعارات استلام متاحة',
+              style: TextStyle(fontSize: 18),
+            ),
+          );
+        }
+
+        return ListView.builder(
+          itemCount: notifications.length,
+          itemBuilder: (context, index) {
+            var notification = notifications[index];
+            return Padding(
+              padding: const EdgeInsets.all(15),
+              child: Directionality(textDirection: TextDirection.rtl,
+                child: PaymentNotificationCard(
+                  message: notification['message'],
+                  paidAmount: notification['paid_amount'],
+                  remainingAmount: notification['remaining_amount'],
+                  timestamp: notification['timestamp'],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+}
+
+// ويدجت لعرض تبويب التبليغات العامة
+class GeneralNotificationsTab extends StatelessWidget {
+  final String studentDocumentId;
+  final FirebaseFirestore firestore = FirebaseFirestore.instance;
+
+  GeneralNotificationsTab({required this.studentDocumentId});
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<QuerySnapshot>(
+      stream: firestore
+          .collection('notifications')// مجموعة التبليغات العامة
+          .orderBy('timestamp', descending: true)
+          .snapshots(),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        var notifications = snapshot.data!.docs;
+
+        if (notifications.isEmpty) {
+          return const Center(
+            child: Text(
+              'لا يوجد إشعارات عامة متاحة',
+              style: TextStyle(fontSize: 18),
+            ),
+          );
+        }
+
+        return ListView.builder(
+          itemCount: notifications.length,
+          itemBuilder: (context, index) {
+            var notification = notifications[index];
+            return Padding(
+              padding: const EdgeInsets.all(15),
+              child: Directionality(textDirection: TextDirection.rtl,
+                child: GeneralNotificationCard(
+                  message: notification['message'],
+                  timestamp: notification['timestamp'],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+}
+
+// Directionality لعرض إشعارات الدفع في شكل بطاقة
 class PaymentNotificationCard extends StatelessWidget {
   final String message;
   final int paidAmount;
   final int remainingAmount;
-  final DateTime timestamp;
+  final String timestamp;
 
   const PaymentNotificationCard({
     Key? key,
@@ -76,7 +156,7 @@ class PaymentNotificationCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var formattedDate = "${timestamp.year}-${timestamp.month.toString().padLeft(2, '0')}-${timestamp.day.toString().padLeft(2, '0')}";
+    // var formattedDate = "${timestamp.year}-${timestamp.month.toString().padLeft(2, '0')}-${timestamp.day.toString().padLeft(2, '0')}";
     return Card(
       elevation: 4,
       margin: const EdgeInsets.symmetric(vertical: 8.0),
@@ -99,7 +179,7 @@ class PaymentNotificationCard extends StatelessWidget {
             Align(
               alignment: Alignment.bottomLeft,
               child: Text(
-                formattedDate,
+                timestamp,
                 style: TextStyle(
                   color: Colors.teal[700],
                   fontSize: 16.0,
@@ -117,7 +197,7 @@ class PaymentNotificationCard extends StatelessWidget {
 // Widget لعرض التبليغات العامة في شكل بطاقة
 class GeneralNotificationCard extends StatelessWidget {
   final String message;
-  final DateTime timestamp;
+  final String timestamp;
 
   const GeneralNotificationCard({
     Key? key,
@@ -127,7 +207,7 @@ class GeneralNotificationCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var formattedDate = "${timestamp.year}-${timestamp.month.toString().padLeft(2, '0')}-${timestamp.day.toString().padLeft(2, '0')}";
+    // var formattedDate = "${timestamp.year}-${timestamp.month.toString().padLeft(2, '0')}-${timestamp.day.toString().padLeft(2, '0')}";
     return Card(
       elevation: 4,
       margin: const EdgeInsets.symmetric(vertical: 8.0),
@@ -143,11 +223,11 @@ class GeneralNotificationCard extends StatelessWidget {
               message,
               style: const TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 8.0),
+            const SizedBox(height: 18.0),
             Align(
               alignment: Alignment.bottomLeft,
               child: Text(
-                formattedDate,
+                timestamp,
                 style: TextStyle(
                   color: Colors.teal[700],
                   fontSize: 16.0,
