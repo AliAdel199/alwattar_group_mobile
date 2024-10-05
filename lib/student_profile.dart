@@ -1,3 +1,4 @@
+import 'package:alwattar_group_mobile/SubjectsPage.dart';
 import 'package:alwattar_group_mobile/notificationscreen.dart';
 import 'package:alwattar_group_mobile/payment_summary.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -194,7 +195,9 @@ class _StudentProfileState extends State<StudentProfile> {
             // الأزرار السفلية
             ElevatedButton(
               onPressed: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context)=>PaymentSummaryScreen(student_id: widget.userID!,)));
+                // Navigator.push(context, MaterialPageRoute(builder: (context)=>PaymentSummaryScreen(student_id: widget.userID!,)));
+                Navigator.push(context, MaterialPageRoute(builder: (context)=>SubjectsPage()));
+
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: kColor,

@@ -1,3 +1,4 @@
+import 'package:alwattar_group_mobile/SubjectsPage.dart';
 import 'package:alwattar_group_mobile/constant.dart';
 import 'package:alwattar_group_mobile/login_page.dart';
 import 'package:alwattar_group_mobile/rectanglebtn.dart';
@@ -212,7 +213,7 @@ class MyApp extends StatelessWidget {
           firestore6: firestore6,
           firestore7: firestore7,
           firestore8: firestore8),
-          // '/userProfile':(context) => UserProfilePage()
+          // '/userProfile':(context) => SubjectsPage()
       },
       // home: MyHomePage(
       //     title: 'Flutter Demo Home Page',
